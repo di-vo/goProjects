@@ -1,76 +1,65 @@
 # Go Cheatsheet
 
+- [Go Cheatsheet](#go-cheatsheet)
+  - [Variables](#variables)
+  - [Functions](#functions)
+  - [Flow Control](#flow-control)
+    - [For](#for)
+    - [If](#if)
+    - [Switch](#switch)
+    - [Defer](#defer)
+  - [Data Structures](#data-structures)
+    - [Structs](#structs)
+    - [Arrays & Slices](#arrays--slices)
+    - [Maps](#maps)
+  - [Methods & Interfaces](#methods--interfaces)
+    - [Methods](#methods)
+    - [Interfaces](#interfaces)
+  - [Errors](#errors)
+  - [Readers](#readers)
+
+
 ## Variables
 
 **Important**: Go has a garbage collector
 
-### Initialization / Declaration
-
-**var declaration**:
-
-- var hello <type> = "hello"
-  - either type or value can be omitted, not both
-  - multiple variable declarations per line are possible
-  - "Zero values" - **There are no uninitialised variables**:
-    - number types: 0
-    - string: ""
-    - bool: false
-    - interfaces / pointers: nil
-
-**shorthand declaration**:
-
-- hello := "hello"
-  - multiple variable declarations per line are possible
-  - no type, value can not be omitted
-
-### Assignment
-
-- "=" operator
-- all variables are mutable
-- variable type is immutable after declaration
-- multiple assignments per line are possible
-
-### Scope
-
-**package level**:
-
-- outside any function
-- accesible in the entire package
-- can only be declared with var variant
-
-**block level**:
-
-- inside a block (function, if, loop)
-- commonly initialised with the shorthand variant
-- implicit blocks: switch case, select
-
-### Shadowing
-
-- variables with the same name can be declared in an inner scope
-- variables are not affected by each other
-- using the name in the inner block will always refer to the inner variable
-- *edge case*:
-
 ```go
-var a, b int
-c, a, b := 3, 1, 2
-```
+// Initialization / Declaration
+var s string
+var s string = "hello"
 
-- this works because only the c is being declared, the others are assigned to
+// only available in local scopes
+s := "hello"
 
-### Type Conversion
+// multiple assignments
+var x, y int
+s, a := "world", "hello"
 
-- T(v), example: i := 42; f := float64(i)
+// var block
+var (
+    x
+    y
+)
 
-### Consts
+//NOTE: there are no uninitialised variables
 
-- consts can only be declared using var
-- you can declare multiple consts in a const () block
-- numeric consts are high precision values
+// shadowing
+// variables with the same name can be declared in an inner scope
+// variables are not affected by each other
+func main() {
+    i := 0
 
-### Pointers
+    if condition {
+        i := 10
+        fmt.Prinln(i) // 10
+    }
+}
 
-```go
+// type conversion: Type(value)
+i := 32
+f := float64(i)
+
+// pointers
 x := 10
 
 ptrToX := &x // pointer
@@ -79,10 +68,6 @@ ptrToX := &x // pointer
 var anotherPtrToX *int
 anotherPtrToX = &x
 ```
-
-### Misc
-
-- only names starting with a capital letter are exported
 
 ## Functions
 
@@ -134,7 +119,7 @@ for i := 0; i < 10; i++ {
     
 }
 
-// without init and post
+// without init and post, equivalent to while
 for ; i < 100 ; {
 
 }
@@ -190,7 +175,7 @@ default:
 
 ### Defer
 
-- you can defer the execution of a function by prepending the defer keyword
+- you can defer the execution of a function to the end of the current block by prepending the defer keyword
 - multiple defers get pushed onto a stack, and executed last-in-first-out
 
 
