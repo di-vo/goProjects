@@ -1,0 +1,122 @@
+package main
+
+import (
+	"bufio"
+	"fmt"
+	"os"
+	"strconv"
+	"strings"
+)
+
+var (
+	fish []int
+)
+
+func partOne(scanner bufio.Scanner) {
+	for scanner.Scan() {
+		// only one line
+		fishStrings := strings.Split(scanner.Text(), ",")
+
+		for _, e := range fishStrings {
+			elem, _ := strconv.Atoi(e)
+			fish = append(fish, elem)
+		}
+	}
+
+	for range 80 {
+		tmpSlice := make([]int, 0)
+
+		for i, e := range fish {
+			if e == 0 {
+				fish[i] = 6
+				tmpSlice = append(tmpSlice, 8)
+			} else {
+				fish[i]--
+			}
+		}
+
+		fish = append(fish, tmpSlice...)
+	}
+
+	fmt.Printf("result: %d\n", len(fish))
+}
+
+func partTwo(scanner bufio.Scanner, file os.File) {
+	for scanner.Scan() {
+		// only one line
+		fishStrings := strings.Split(scanner.Text(), ",")
+
+		for _, e := range fishStrings {
+			elem, _ := strconv.Atoi(e)
+			fish = append(fish, elem)
+		}
+	}
+
+	for _, e := range fish {
+		ptrToE := &e
+
+		tmpFish := make([]int64, 0)
+		tmpFish = append(tmpFish, int64(*ptrToE))
+
+		fmt.Printf("tf: %d\n", tmpFish)
+
+		for range 80 {
+			tmpSlice := make([]int64, 0)
+
+			for i, e := range tmpFish {
+				if e == 0 {
+					tmpFish[i] = 6
+					tmpSlice = append(tmpSlice, 8)
+				} else {
+					tmpFish[i]--
+				}
+			}
+
+			tmpFish = append(tmpFish, tmpSlice...)
+		}
+
+		fmt.Printf("ptr: %d", *ptrToE)
+		lenString := strconv.Itoa(len(tmpFish))
+		if _, err := file.WriteString(lenString + "\n"); err != nil {
+			panic(err)
+		}
+	}
+
+}
+
+func main() {
+	fi, err := os.Open("input.txt")
+	if err != nil {
+		panic(err)
+	}
+
+	storFi, err := os.OpenFile("storage.txt", os.O_APPEND|os.O_WRONLY, 0644)
+	if err != nil {
+		panic(err)
+	}
+
+	defer func() {
+		if err := fi.Close(); err != nil {
+			panic(err)
+		}
+
+		if err := storFi.Close(); err != nil {
+			panic(err)
+		}
+	}()
+
+	scanner := bufio.NewScanner(fi)
+
+	// partOne(*scanner)
+	partTwo(*scanner, *storFi)
+
+	result := 0
+	storScanner := bufio.NewScanner(storFi)
+
+	for storScanner.Scan() {
+		tmp, _ := strconv.Atoi(scanner.Text())
+		result += tmp
+	}
+
+	fmt.Printf("result: %d\n", result)
+}
