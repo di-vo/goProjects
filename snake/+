@@ -1,0 +1,190 @@
+package main
+
+import (
+	"fmt"
+	"math/rand/v2"
+	"os"
+	"slices"
+	"strings"
+	"time"
+
+	"github.com/charmbracelet/bubbles/timer"
+	tea "github.com/charmbracelet/bubbletea"
+)
+
+const (
+    rows = 10
+    cols = 10
+    timeout = time.Second
+    playerInterval = time.Second / 4
+    itemInterval = 5
+)
+
+var (
+    itemTimerCount int = itemInterval
+)
+
+type vec struct {
+    x,y int
+}
+
+type playerStruct struct {
+    head vec
+    dir vec
+    body []vec
+}
+
+type model struct {
+    timer timer.Model
+    board [][]int
+    player playerStruct
+    items []vec
+    score int
+}
+
+func randRange(min, max int) int {
+    return rand.IntN(max-min) + min
+}
+
+func initialModel() model {
+    board := make([][]int, rows)
+
+    for i := range board {
+        board[i] = make([]int, cols)
+    }
+
+    player := playerStruct {
+        head: vec{x: 0, y: 0},
+        dir: vec{x: 1, y: 0},
+        body: make([]vec, 0),
+    }
+
+	return model{
+        timer: timer.NewWithInterval(timeout, playerInterval),
+        board: board,
+        player: player,
+        items: make([]vec, 0),
+        score: 0,
+	}
+}
+
+func (m model) Init() tea.Cmd {
+	return m.timer.Init()
+}
+
+func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
+	switch msg := msg.(type) {
+	case tea.KeyMsg:
+		switch msg.String() {
+		case "ctrl+c", "q":
+			return m, tea.Quit
+        case "left", "h":
+            m.player.dir = vec{x: -1, y: 0}
+        case "down", "j":
+            m.player.dir = vec{x: 0, y: 1}
+        case "up", "k":
+            m.player.dir = vec{x: 0, y: -1}
+        case "right", "l":
+            m.player.dir = vec{x: 1, y: 0}
+		}
+    case timer.TickMsg:
+        if (m.player.dir.x < 0 && m.player.head.x > 0) || (m.player.dir.x > 0 && m.player.head.x < rows - 1) {
+            // horizontal check
+            m.player.head.x += m.player.dir.x
+        } else if (m.player.dir.y < 0 && m.player.head.y > 0) || (m.player.dir.y > 0 && m.player.head.y < cols - 1) {
+            // vertical check
+            m.player.head.y += m.player.dir.y
+        } else {
+            return m, tea.Quit
+        }
+
+        for i := range m.player.body {
+            if i == 0 {
+                m.player.body[i].x = m.player.head.x
+                m.player.body[i].y = m.player.head.y
+            } else {
+                m.player.body[i].x = m.player.body[i - 1].x
+                m.player.body[i].y = m.player.body[i - 1].x
+            }
+        }
+
+        idx := slices.IndexFunc(m.items, func(v vec) bool { return m.player.head.x == v.x && m.player.head.y == v.y })
+
+        if idx != -1 {
+            m.player.body = append(m.player.body, vec{x: m.items[idx].x - m.player.dir.x, y: m.items[idx].y - m.player.dir.y})
+            m.items = slices.Delete(m.items, idx, idx + 1)
+            m.score++
+        }
+
+        var cmd tea.Cmd
+		m.timer, cmd = m.timer.Update(msg)
+		return m, cmd
+    case timer.TimeoutMsg:
+        itemTimerCount++
+
+        if itemTimerCount >= itemInterval {
+            spawn := vec{x: randRange(0, rows), y: randRange(0, cols)}
+            m.items = append(m.items, spawn)
+            itemTimerCount = 0
+        }
+        m.timer.Timeout = timeout
+	}
+
+	return m, nil
+}
+
+func (m model) View() string {
+    s := "Term Snake!\n\n"
+
+    s += fmt.Sprintf("Score: %d\n\n", m.score)
+
+    s += strings.Repeat("-", rows + 2) + "\n"
+
+    for i := range m.board {
+        for j := range m.board[i] {
+            if j == 0 {
+                s += "|"
+            }
+
+            c := " "
+
+            for _, e := range m.items {
+                if e.x == j && e.y == i {
+                    c = "x"
+                }
+            }
+
+            // head
+            if m.player.head.x == j && m.player.head.y == i {
+                c = "o"
+            }
+
+            // body
+            for _, e := range m.player.body {
+                if e.x == j && e.y == i {
+                    c = "e"
+                }
+            }
+
+            s += c
+
+            if j == len(m.board[i]) - 1 {
+                s += "|"
+            }
+        }
+        s += "\n"
+    }
+
+    s += strings.Repeat("-", rows + 2) + "\n"
+
+	return s
+}
+
+func main() {
+    p := tea.NewProgram(initialModel())
+
+    if _, err := p.Run(); err != nil {
+        fmt.Printf("Alas, there's been an error: %v", err)
+        os.Exit(1)
+    }
+}
