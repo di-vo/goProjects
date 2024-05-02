@@ -5,11 +5,13 @@ import (
 	"math/rand/v2"
 	"os"
 	"slices"
+	"strconv"
 	"strings"
 	"time"
 
 	"github.com/charmbracelet/bubbles/timer"
 	tea "github.com/charmbracelet/bubbletea"
+	"github.com/charmbracelet/lipgloss"
 )
 
 const (
@@ -22,6 +24,9 @@ const (
 
 var (
 	itemTimerCount int = itemInterval
+	headStyle          = lipgloss.NewStyle().Foreground(lipgloss.Color("#E23A08"))
+	bodyStyle          = lipgloss.NewStyle().Foreground(lipgloss.Color("#04B575"))
+	itemStyle          = lipgloss.NewStyle().Foreground(lipgloss.Color("202"))
 )
 
 type vec struct {
@@ -72,6 +77,8 @@ func initialModel() model {
 		board[i] = make([]int, cols)
 	}
 
+	board[0][0] = 1
+
 	player := playerStruct{
 		head: playerElem{pos: vec{x: 0, y: 0}, dir: vec{x: 1, y: 0}},
 		body: make([]playerElem, 0),
@@ -83,7 +90,7 @@ func initialModel() model {
 		player: player,
 		items:  make([]vec, 0),
 		score:  0,
-        won: false,
+		won:    false,
 	}
 }
 
@@ -115,6 +122,8 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			}
 		}
 	case timer.TickMsg:
+		m.board[m.player.head.pos.y][m.player.head.pos.x] = 0
+
 		if (m.player.head.dir.x < 0 && m.player.head.pos.x > 0) || (m.player.head.dir.x > 0 && m.player.head.pos.x < rows-1) {
 			// horizontal check
 			m.player.head.pos.x += m.player.head.dir.x
@@ -125,6 +134,9 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			return m, tea.Quit
 		}
 
+		m.board[m.player.head.pos.y][m.player.head.pos.x] = 1
+
+		// check if head touches body
 		overlap := slices.IndexFunc(m.player.body, func(v playerElem) bool { return m.player.head.pos.x == v.pos.x && m.player.head.pos.y == v.pos.y })
 
 		if overlap != -1 {
@@ -132,7 +144,9 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		}
 
 		for i := range m.player.body {
+			m.board[m.player.body[i].pos.y][m.player.body[i].pos.x] = 0
 			m.player.body[i].pos = m.player.body[i].pos.add(m.player.body[i].dir)
+			m.board[m.player.body[i].pos.y][m.player.body[i].pos.x] = 1
 		}
 
 		for i := len(m.player.body) - 1; i >= 0; i-- {
@@ -143,6 +157,7 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			}
 		}
 
+		// check if head is on an item
 		idx := slices.IndexFunc(m.items, func(v vec) bool { return m.player.head.pos.x == v.x && m.player.head.pos.y == v.y })
 
 		if idx != -1 {
@@ -156,14 +171,33 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				dir = m.player.body[len(m.player.body)-1].dir
 			}
 
+            //TODO: idk do this better
+
+            // check that pos is in bounds
+            // if pos.x < 0 || pos.x > rows || pos.y < 0 || pos.y > cols {
+            //     pos.add(dir)  
+            //
+            //     switch {
+            //     case pos.x - 1 >= 0 && m.board[pos.y][pos.x - 1] == 0:
+            //         pos.x--
+            //     case pos.x + 1 < rows && m.board[pos.y][pos.x + 1] == 0:
+            //         pos.x++
+            //     case pos.y - 1 >= 0 && m.board[pos.y - 1][pos.x] == 0:
+            //         pos.y--
+            //     case pos.y + 1 < cols && m.board[pos.y + 1][pos.x] == 0:
+            //         pos.y++
+            //     }
+            // }
+
 			m.player.body = append(m.player.body, playerElem{pos: pos, dir: dir})
+			m.board[m.items[idx].y][m.items[idx].x] = 0
 			m.items = slices.Delete(m.items, idx, idx+1)
 			m.score++
 
-            if len(m.player.body) == rows * cols - 1 {
-                m.won = true
-                return m, tea.Quit
-            }
+			if len(m.player.body) == rows*cols-1 {
+				m.won = true
+				return m, tea.Quit
+			}
 		}
 
 		var cmd tea.Cmd
@@ -174,6 +208,11 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 		if itemTimerCount >= itemInterval {
 			spawn := vec{x: randRange(0, rows), y: randRange(0, cols)}
+			for m.board[spawn.y][spawn.x] != 0 {
+				spawn = vec{x: randRange(0, rows), y: randRange(0, cols)}
+			}
+			m.board[spawn.y][spawn.x] = 1
+
 			m.items = append(m.items, spawn)
 			itemTimerCount = 0
 		}
@@ -188,48 +227,55 @@ func (m model) View() string {
 
 	s += fmt.Sprintf("Score: %d\n\n", m.score)
 
-	s += strings.Repeat("-", rows+2) + "\n"
+	for i := range m.board {
+		for j := range m.board[i] {
+			s += strconv.Itoa(m.board[i][j])
+		}
+		s += "\n"
+	}
+
+	s += "┌" + strings.Repeat("─", rows) + "┐" + "\n"
 
 	for i := range m.board {
 		for j := range m.board[i] {
 			if j == 0 {
-				s += "|"
+				s += "│"
 			}
 
 			c := " "
 
 			for _, e := range m.items {
 				if e.x == j && e.y == i {
-					c = "x"
+					c = itemStyle.Render("x")
 				}
 			}
 
 			// head
 			if m.player.head.pos.x == j && m.player.head.pos.y == i {
-				c = "o"
+				c = headStyle.Render("e")
 			}
 
 			// body
 			for _, e := range m.player.body {
 				if e.pos.x == j && e.pos.y == i {
-					c = "e"
+					c = bodyStyle.Render("o")
 				}
 			}
 
 			s += c
 
 			if j == len(m.board[i])-1 {
-				s += "|"
+				s += "│"
 			}
 		}
 		s += "\n"
 	}
 
-	s += strings.Repeat("-", rows+2) + "\n"
+	s += "└" + strings.Repeat("─", rows) + "┘" + "\n"
 
-    if m.won {
-        s += "You won!\n"
-    }
+	if m.won {
+		s += "You won!\n"
+	}
 
 	return s
 }
