@@ -48,10 +48,8 @@ type playerElem struct {
 }
 
 type playerStruct struct {
-	head  playerElem
-	pHead playerElem
-	body  []playerElem
-	pBody []playerElem
+	head playerElem
+	body []playerElem
 }
 
 type model struct {
@@ -60,6 +58,7 @@ type model struct {
 	player playerStruct
 	items  []vec
 	score  int
+	won    bool
 }
 
 func randRange(min, max int) int {
@@ -74,10 +73,8 @@ func initialModel() model {
 	}
 
 	player := playerStruct{
-		head:  playerElem{pos: vec{x: 0, y: 0}, dir: vec{x: 1, y: 0}},
-		pHead: playerElem{pos: vec{x: 0, y: 0}, dir: vec{x: 1, y: 0}},
-		body:  make([]playerElem, 0),
-		pBody: make([]playerElem, 0),
+		head: playerElem{pos: vec{x: 0, y: 0}, dir: vec{x: 1, y: 0}},
+		body: make([]playerElem, 0),
 	}
 
 	return model{
@@ -86,6 +83,7 @@ func initialModel() model {
 		player: player,
 		items:  make([]vec, 0),
 		score:  0,
+        won: false,
 	}
 }
 
@@ -100,13 +98,21 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		case "ctrl+c", "q":
 			return m, tea.Quit
 		case "left", "h":
-			m.player.head.dir = vec{x: -1, y: 0}
+			if m.player.head.dir.x == 0 {
+				m.player.head.dir = vec{x: -1, y: 0}
+			}
 		case "down", "j":
-			m.player.head.dir = vec{x: 0, y: 1}
+			if m.player.head.dir.y == 0 {
+				m.player.head.dir = vec{x: 0, y: 1}
+			}
 		case "up", "k":
-			m.player.head.dir = vec{x: 0, y: -1}
+			if m.player.head.dir.y == 0 {
+				m.player.head.dir = vec{x: 0, y: -1}
+			}
 		case "right", "l":
-			m.player.head.dir = vec{x: 1, y: 0}
+			if m.player.head.dir.x == 0 {
+				m.player.head.dir = vec{x: 1, y: 0}
+			}
 		}
 	case timer.TickMsg:
 		if (m.player.head.dir.x < 0 && m.player.head.pos.x > 0) || (m.player.head.dir.x > 0 && m.player.head.pos.x < rows-1) {
@@ -119,11 +125,20 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			return m, tea.Quit
 		}
 
+		overlap := slices.IndexFunc(m.player.body, func(v playerElem) bool { return m.player.head.pos.x == v.pos.x && m.player.head.pos.y == v.pos.y })
+
+		if overlap != -1 {
+			return m, tea.Quit
+		}
+
 		for i := range m.player.body {
+			m.player.body[i].pos = m.player.body[i].pos.add(m.player.body[i].dir)
+		}
+
+		for i := len(m.player.body) - 1; i >= 0; i-- {
 			if i == 0 {
-				m.player.body[i] = m.player.pHead
+				m.player.body[i].dir = m.player.head.dir
 			} else {
-				m.player.body[i].pos = m.player.body[i].pos.add(m.player.body[i].dir)
 				m.player.body[i].dir = m.player.body[i-1].dir
 			}
 		}
@@ -144,13 +159,15 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			m.player.body = append(m.player.body, playerElem{pos: pos, dir: dir})
 			m.items = slices.Delete(m.items, idx, idx+1)
 			m.score++
+
+            if len(m.player.body) == rows * cols - 1 {
+                m.won = true
+                return m, tea.Quit
+            }
 		}
 
 		var cmd tea.Cmd
 		m.timer, cmd = m.timer.Update(msg)
-
-		m.player.pHead = m.player.head
-		m.player.pBody = m.player.body
 		return m, cmd
 	case timer.TimeoutMsg:
 		itemTimerCount++
@@ -170,7 +187,6 @@ func (m model) View() string {
 	s := "Term Snake!\n\n"
 
 	s += fmt.Sprintf("Score: %d\n\n", m.score)
-	s += fmt.Sprintf("Head: %d, pHead: %d\n\n", m.player.head, m.player.pHead)
 
 	s += strings.Repeat("-", rows+2) + "\n"
 
@@ -210,6 +226,10 @@ func (m model) View() string {
 	}
 
 	s += strings.Repeat("-", rows+2) + "\n"
+
+    if m.won {
+        s += "You won!\n"
+    }
 
 	return s
 }
