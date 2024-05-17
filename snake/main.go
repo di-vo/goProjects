@@ -5,7 +5,6 @@ import (
 	"math/rand/v2"
 	"os"
 	"slices"
-	"strconv"
 	"strings"
 	"time"
 
@@ -227,12 +226,12 @@ func (m model) View() string {
 
 	s += fmt.Sprintf("Score: %d\n\n", m.score)
 
-	for i := range m.board {
-		for j := range m.board[i] {
-			s += strconv.Itoa(m.board[i][j])
-		}
-		s += "\n"
-	}
+	// for i := range m.board {
+	// 	for j := range m.board[i] {
+	// 		s += strconv.Itoa(m.board[i][j])
+	// 	}
+	// 	s += "\n"
+	// }
 
 	s += "┌" + strings.Repeat("─", rows) + "┐" + "\n"
 
