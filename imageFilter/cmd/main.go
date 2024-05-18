@@ -8,18 +8,20 @@ import (
 
 const (
 	fileName   = "papagei.png"
-	outputName = "papagei_blur.png"
+    outputName = "papagei_edge.png"
 )
 
 
 func main() {
+    // utils.JpegToPngConv("bridge.jpeg")
+
 	img, format, err := utils.DecodeFile(fileName)
 	if err != nil {
 		panic(err)
 	}
 	fmt.Printf("format: %s\n", format)
 
-    imgCopy := filters.ApplyBasicBlurFilter(img, 10)
+    imgCopy := filters.ApplyEdgeFilter(img)
 
     utils.SaveNewImage(imgCopy, outputName)
 }
