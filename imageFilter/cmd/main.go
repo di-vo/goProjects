@@ -7,8 +7,8 @@ import (
 )
 
 const (
-	fileName   = "papagei.png"
-    outputName = "papagei_edge.png"
+	fileName   = "bridge.png"
+    outputName = "bridge_spot.png"
 )
 
 
@@ -21,7 +21,7 @@ func main() {
 	}
 	fmt.Printf("format: %s\n", format)
 
-    imgCopy := filters.ApplyEdgeFilter(img)
+    imgCopy := filters.ApplySpotFilter(img, 2000)
 
     utils.SaveNewImage(imgCopy, outputName)
 }

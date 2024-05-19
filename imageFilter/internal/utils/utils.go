@@ -33,6 +33,7 @@ func SaveNewImage(img image.Image, outputName string) {
 	png.Encode(outFile, img)
 }
 
+// Helper function to generate a usable png image from a jpeg image
 func JpegToPngConv(fileName string) {
     fi, err := os.Open(fileName)
     if err != nil {
