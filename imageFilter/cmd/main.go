@@ -9,11 +9,11 @@ import (
 	"strings"
 )
 
-
 var (
-    filterFlag = flag.String("f", "", "Define a filter. Valid filters are blur, edge, spot, invert, comic.")
-    imageFlag = flag.String("i", "", "The name of the image file")
+    filterFlag = flag.String("f", "", "Define a filter. Valid filters are blur, edge, spot, invert, comic, heat.")
+    sourceFlag = flag.String("s", "", "The name of the source image file")
     helpFlag = flag.Bool("h", false, "Shows this help message")
+    convertFlag = flag.Bool("c", false, "Create a new PNG from the given JPEG image")
     outputName string
     filterName string
 )
@@ -26,9 +26,12 @@ func main() {
         return
     }
 
-	// utils.JpegToPngConv("mountain.jpg")
+    if *convertFlag {
+	    utils.JpegToPngConv(*sourceFlag)
+        return
+    }
 
-	img, format, err := utils.DecodeFile(*imageFlag)
+	img, format, err := utils.DecodeFile(*sourceFlag)
 	if err != nil {
 		panic(err)
 	}
@@ -38,7 +41,7 @@ func main() {
 
     switch *filterFlag {
     case "spot":
-	    imgCopy = filters.ApplySpotFilter(img, 2000)
+	    imgCopy = filters.ApplySpotFilter(img, 200)
     case "blur":
 	    imgCopy = filters.ApplyBasicBlurFilter(img, 20)
     case "edge":
@@ -47,7 +50,9 @@ func main() {
 	    imgCopy = filters.ApplyInvertFilter(img)
     case "comic":
 	    imgCopy = filters.ApplyComicFilter(img)
+    case "heat":
+	    imgCopy = filters.ApplyHeatFilter(img)
     }
 
-	utils.SaveNewImage(imgCopy, fmt.Sprintf("%s_%s.png", strings.Split(*imageFlag, ".")[0], *filterFlag))
+	utils.SaveNewImage(imgCopy, fmt.Sprintf("%s_%s.png", strings.Split(*sourceFlag, ".")[0], *filterFlag))
 }
