@@ -1,13 +1,11 @@
 package internal
 
 import (
+    utils "assignments/imageFilter/internal/utils"
 	"image"
 	"image/color"
 )
 
-func getIntensity(r, g, b uint32) float64 {
-	return 0.2126*float64(r) + 0.7152*float64(g) + 0.0722*float64(b)
-}
 
 func ApplyEdgeFilter(img image.Image) image.Image {
 	size := img.Bounds().Size()
@@ -16,7 +14,7 @@ func ApplyEdgeFilter(img image.Image) image.Image {
 	for x := range size.X {
 		for y := range size.Y {
 			r, g, b, a := img.At(x, y).RGBA()
-            intens := getIntensity(r, g, b)
+            intens := utils.GetIntensity(r, g, b)
 			var count uint32 = 9
 
 			if y-1 >= 0 && y+1 < size.Y-1 && x-1 >= 0 && x+1 < size.X-1 {
@@ -32,15 +30,15 @@ func ApplyEdgeFilter(img image.Image) image.Image {
 
 
                 // weighing direct neighbors twice as much
-                intensN := getIntensity(r1, g1, b1) * 2
-                intensS := getIntensity(r2, g2, b2) * 2
-                intensW := getIntensity(r3, g3, b3) * 2
-                intensE := getIntensity(r4, g4, b4) * 2
+                intensN := utils.GetIntensity(r1, g1, b1) * 2
+                intensS := utils.GetIntensity(r2, g2, b2) * 2
+                intensW := utils.GetIntensity(r3, g3, b3) * 2
+                intensE := utils.GetIntensity(r4, g4, b4) * 2
 
-                intensNE := getIntensity(r5, g5, b5)
-                intensSE := getIntensity(r6, g6, b6)
-                intensSW := getIntensity(r7, g7, b7)
-                intensNW := getIntensity(r8, g8, b8)
+                intensNE := utils.GetIntensity(r5, g5, b5)
+                intensSE := utils.GetIntensity(r6, g6, b6)
+                intensSW := utils.GetIntensity(r7, g7, b7)
+                intensNW := utils.GetIntensity(r8, g8, b8)
 
 				r = uint32(intens) + (uint32(intensNW + intensW + intensSW) - uint32(intensNE + intensE + intensSE)) + (uint32(intensNW + intensN + intensNE) - uint32(intensSW + intensS + intensSE))
 				g = r

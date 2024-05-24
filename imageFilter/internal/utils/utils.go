@@ -54,3 +54,7 @@ func JpegToPngConv(fileName string) {
 
     png.Encode(outFile, img)
 }
+
+func GetIntensity(r, g, b uint32) float64 {
+	return 0.2126*float64(r) + 0.7152*float64(g) + 0.0722*float64(b)
+}
