@@ -1,21 +1,19 @@
 package internal
 
 import (
+	types "assignments/imageFilter/internal/types"
 	utils "assignments/imageFilter/internal/utils"
-	"fmt"
 	"image"
 	"image/color"
 )
 
-func ApplyComicFilter(img image.Image) image.Image {
-	size := img.Bounds().Size()
-	imgCopy := image.NewRGBA64(image.Rect(0, 0, size.X, size.Y))
+func ApplyComicFilter(img image.Image, d types.ImagePartData, imageChan chan types.ImageData) {
+	imgCopy := image.NewRGBA64(image.Rect(0, 0, d.Width, d.Height))
 
-	for x := range size.X {
-		for y := range size.Y {
+	for x := d.StartX; x < d.StartX + d.Width; x++ {
+		for y := d.StartY; y < d.StartY + d.Height; y++ {
 			r, g, b, a := img.At(x, y).RGBA()
 			intens := utils.GetIntensity(r, g, b) / 255
-            fmt.Println(intens)
 
 			switch true {
 			case intens > 0 && intens <= 85:
@@ -25,7 +23,6 @@ func ApplyComicFilter(img image.Image) image.Image {
 			case intens > 170 && intens <= 255:
 				intens = 212 
 			}
-            fmt.Println(intens)
 
 			clr := color.RGBA64{
 				R: uint16(intens) * 255,
@@ -33,10 +30,25 @@ func ApplyComicFilter(img image.Image) image.Image {
 				B: uint16(intens) * 255,
 				A: uint16(a),
 			}
-			imgCopy.SetRGBA64(x, y, clr)
+            newX := x
+            newY := y
+
+            if newX >= d.Width {
+                newX -= d.StartX
+            }
+
+            if newY >= d.Height {
+                newY -= d.StartY
+            }
+			imgCopy.SetRGBA64(newX, newY, clr)
 		}
 	}
 
-	return imgCopy
+    out := types.ImageData{
+        Img: imgCopy,
+        StartX: d.StartX,
+        StartY: d.StartY,
+    }
 
+	imageChan <- out
 }
