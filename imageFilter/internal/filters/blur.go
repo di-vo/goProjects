@@ -54,6 +54,8 @@ func gaussianBlur(img image.Image, imgCopy *image.RGBA64, d types.ImagePartData,
 	r, g, b, a := img.At(x, y).RGBA()
 
 	colorsInRange := make([]color.RGBA64, 0)
+
+    // setting it to 1 for the pixel itself
     contributionValue := 1.0
 
 	// get every pixel in the range around the pixel
@@ -90,7 +92,6 @@ func gaussianBlur(img image.Image, imgCopy *image.RGBA64, d types.ImagePartData,
 		b += b1
 	}
 
-    // adding 1 for the pixel itself
 	clr := color.RGBA64{
 		R: uint16(float64(r) / contributionValue),
 		G: uint16(float64(g) / contributionValue),
