@@ -7,7 +7,7 @@ import (
 	"image/color"
 )
 
-func applyEdgeFilter(img image.Image, imgCopy *image.RGBA64, d types.ImagePartData, x int, y int) {
+func edgeFilter(img image.Image, imgCopy *image.RGBA64, d types.ImagePartData, x int, y int) {
 	size := img.Bounds().Size()
 
 	r, g, b, a := img.At(x, y).RGBA()

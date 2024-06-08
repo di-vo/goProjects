@@ -7,7 +7,7 @@ import (
 	"image/color"
 )
 
-func applyPixelFilter(img image.Image, imgCopy *image.RGBA64, d types.ImagePartData, x int, y int, radius int) {
+func pixelFilter(img image.Image, imgCopy *image.RGBA64, d types.ImagePartData, x int, y int, radius int) {
 	r, g, b, a := img.At(x, y).RGBA()
 
 	clr := color.RGBA64{

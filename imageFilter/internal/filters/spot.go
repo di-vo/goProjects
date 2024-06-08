@@ -16,7 +16,7 @@ func getNewColor(c uint32, radius uint32, distance float64) uint32 {
 	}
 }
 
-func applySpotFilter(img image.Image, imgCopy *image.RGBA64, d types.ImagePartData, x int, y int, radius uint32) {
+func spotFilter(img image.Image, imgCopy *image.RGBA64, d types.ImagePartData, x int, y int, radius uint32) {
 	size := img.Bounds().Size()
 
 	centerX := size.X / 2

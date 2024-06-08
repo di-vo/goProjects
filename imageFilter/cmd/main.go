@@ -13,7 +13,7 @@ import (
 )
 
 var (
-	filterFlag  = flag.String("f", "", "Define a filter. Valid filters are blur, edge, spot, invert, comic, heat.")
+    filterFlag  = flag.String("f", "", "Define a filter. Valid filters are:\n boxBlur\n gaussianBlur\n edge\n spot\n invert\n comic\n heat\n sort(experimental)\n pixel(experimental)")
 	sourceFlag  = flag.String("s", "", "The name of the source image file")
 	helpFlag    = flag.Bool("h", false, "Shows this help message")
 	convertFlag = flag.Bool("c", false, "Create a new PNG from the given JPEG image")

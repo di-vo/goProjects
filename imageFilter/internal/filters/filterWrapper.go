@@ -12,21 +12,23 @@ func ApplyFilter(filter string, img image.Image, d types.ImagePartData, imageCha
 		for y := d.StartY; y < d.StartY+d.Height; y++ {
 			switch filter {
 			case "comic":
-				applyComicFilter(img, imgCopy, d, x, y)
+				comicFilter(img, imgCopy, d, x, y)
 			case "spot":
-				applySpotFilter(img, imgCopy, d, x, y, 700)
+				spotFilter(img, imgCopy, d, x, y, 700)
 			case "invert":
-				applyInvertFilter(img, imgCopy, d, x, y)
+				invertFilter(img, imgCopy, d, x, y)
 			case "edge":
-				applyEdgeFilter(img, imgCopy, d, x, y)
-			case "blur":
-                applyBasicBlurFilter(img, imgCopy, d, x, y, 4)
+				edgeFilter(img, imgCopy, d, x, y)
+			case "boxBlur":
+                boxBlurFilter(img, imgCopy, d, x, y, 4)
+            case "gaussianBlur":
+                gaussianBlur(img, imgCopy, d, x, y, 4)
             case "heat":
-                applyHeatFilter(img, imgCopy, d, x, y)
+                heatFilter(img, imgCopy, d, x, y)
             case "sort":
-                applySortFilter(img, imgCopy, d, x, y)
+                sortFilter(img, imgCopy, d, x, y)
             case "pixel":
-                applyPixelFilter(img, imgCopy, d, x, y, 2)
+                pixelFilter(img, imgCopy, d, x, y, 2)
 			}
 		}
 	}

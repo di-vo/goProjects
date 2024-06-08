@@ -7,7 +7,7 @@ import (
 	"image/color"
 )
 
-func applyHeatFilter(img image.Image, imgCopy *image.RGBA64, d types.ImagePartData, x int, y int) {
+func heatFilter(img image.Image, imgCopy *image.RGBA64, d types.ImagePartData, x int, y int) {
 	r, g, b, a := img.At(x, y).RGBA()
 	intens := utils.GetIntensity(r, g, b) / 255
 

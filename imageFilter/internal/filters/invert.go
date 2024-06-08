@@ -7,7 +7,7 @@ import (
 	"image/color"
 )
 
-func applyInvertFilter(img image.Image, imgCopy *image.RGBA64, d types.ImagePartData, x int, y int) {
+func invertFilter(img image.Image, imgCopy *image.RGBA64, d types.ImagePartData, x int, y int) {
 	r, g, b, a := img.At(x, y).RGBA()
 
 	r = (255 - (r / 255)) * 255
