@@ -58,3 +58,11 @@ func JpegToPngConv(fileName string) {
 func GetIntensity(r, g, b uint32) float64 {
 	return (0.2126*float64(r) + 0.7152*float64(g) + 0.0722*float64(b))
 }
+
+func MapToLocalCoords(val int, length int, offset int) int{
+    if val >= length {
+        return val - offset
+    }
+
+    return val
+}

@@ -1,63 +1,48 @@
 package internal
 
 import (
+	"assignments/imageFilter/internal/types"
+	utils "assignments/imageFilter/internal/utils"
 	"image"
 	"image/color"
 )
 
-func ApplyBasicBlurFilter(img image.Image, iterations int) image.Image {
+func applyBasicBlurFilter(img image.Image, imgCopy *image.RGBA64, d types.ImagePartData, x int, y int, radius int) {
 	size := img.Bounds().Size()
-	imgCopy := image.NewRGBA64(image.Rect(0, 0, size.X, size.Y))
 
-	for range iterations {
-		for x := range size.X {
-			for y := range size.Y {
-				r, g, b, a := img.At(x, y).RGBA()
-				var count uint32 = 1
+	r, g, b, a := img.At(x, y).RGBA()
 
-				if y-1 >= 0 {
-					r1, g1, b1, _ := img.At(x, y-1).RGBA()
-					r += r1
-					g += g1
-					b += b1
-					count++
-				}
+	colorsInRange := make([]color.Color, 0)
 
-				if x+1 < size.X-1 {
-					r1, g1, b1, _ := img.At(x+1, y).RGBA()
-					r += r1
-					g += g1
-					b += b1
-					count++
-				}
-
-				if y+1 < size.Y-1 {
-					r1, g1, b1, _ := img.At(x, y+1).RGBA()
-					r += r1
-					g += g1
-					b += b1
-					count++
-				}
-
-				if x-1 >= 0 {
-					r1, g1, b1, _ := img.At(x-1, y).RGBA()
-					r += r1
-					g += g1
-					b += b1
-					count++
-				}
-
-				clr := color.RGBA64{
-					R: uint16(r / count),
-					G: uint16(g / count),
-					B: uint16(b / count),
-					A: uint16(a),
-				}
-				imgCopy.SetRGBA64(x, y, clr)
+	// get every pixel in the range around the pixel
+	for i := x - radius; i < (x-radius)+(radius*2+1); i++ {
+		for j := y - radius; j < (y-radius)+(radius*2+1); j++ {
+			if i-1 >= 0 && i+1 < size.X-1 && j-1 >= 0 && j+1 < size.Y-1 {
+                // making sure to not include the pixel itself
+                if i != x || j != y {
+                    colorsInRange = append(colorsInRange, img.At(i, j))
+                }
 			}
 		}
-        img = imgCopy
 	}
 
-	return imgCopy
+	for _, e := range colorsInRange {
+		r1, g1, b1, _ := e.RGBA()
+		r += r1
+		g += g1
+		b += b1
+	}
+
+    // adding 1 for the pixel itself
+	clr := color.RGBA64{
+		R: uint16(int(r) / (len(colorsInRange) + 1)),
+		G: uint16(int(g) / (len(colorsInRange) + 1)),
+		B: uint16(int(b) / (len(colorsInRange) + 1)),
+		A: uint16(a),
+	}
+
+	x = utils.MapToLocalCoords(x, d.Width, d.StartX)
+	y = utils.MapToLocalCoords(y, d.Height, d.StartY)
+
+	imgCopy.SetRGBA64(x, y, clr)
 }

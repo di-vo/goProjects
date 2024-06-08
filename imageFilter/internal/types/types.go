@@ -16,3 +16,8 @@ type ImagePartData struct {
     Width int
     Height int
 }
+
+type Vec2 struct {
+    X int
+    Y int
+}
