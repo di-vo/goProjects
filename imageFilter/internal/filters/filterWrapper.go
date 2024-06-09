@@ -20,17 +20,19 @@ func ApplyFilter(filter string, img image.Image, d types.ImagePartData, imageCha
 			case "edge":
 				edgeFilter(img, imgCopy, d, x, y)
 			case "boxBlur":
-                boxBlurFilter(img, imgCopy, d, x, y, 4)
-            case "gaussianBlur":
-                gaussianBlur(img, imgCopy, d, x, y, 4)
-            case "heat":
-                heatFilter(img, imgCopy, d, x, y)
-            case "sort":
-                sortFilter(img, imgCopy, d, x, y)
-            case "pixel":
-                pixelFilter(img, imgCopy, d, x, y, 2)
-            case "kuwahara":
-                basicKuwahara(img, imgCopy, d, x, y, 6)
+				boxBlurFilter(img, imgCopy, d, x, y, 4)
+			case "gaussianBlur":
+				gaussianBlur(img, imgCopy, d, x, y, 4)
+			case "heat":
+				heatFilter(img, imgCopy, d, x, y)
+			case "sort":
+				sortFilter(img, imgCopy, d, x, y)
+			case "pixel":
+				pixelFilter(img, imgCopy, d, x, y, 2)
+			case "basicKuwa":
+				basicKuwahara(img, imgCopy, d, x, y, 4)
+            case "generalKuwa":
+                generalKuwahara(img, imgCopy, d, x, y, 4)
 			}
 		}
 	}
