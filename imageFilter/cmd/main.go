@@ -7,13 +7,14 @@ import (
 	"flag"
 	"fmt"
 	"image"
+	"runtime"
 	"strings"
 	"sync"
 	"time"
 )
 
 var (
-    filterFlag  = flag.String("f", "", "Define a filter. Valid filters are:\n boxBlur\n gaussianBlur\n edge\n spot\n invert\n comic\n heat\n sort(experimental)\n pixel(experimental)")
+    filterFlag  = flag.String("f", "", "Define a filter. Valid filters are:\n boxBlur\n gaussianBlur\n edge\n spot\n invert\n comic\n heat\n sort(VERY SLOW!)\n pixel(experimental)\n basicKuwahara\n generalKuwahara(experimental)")
 	sourceFlag  = flag.String("s", "", "The name of the source image file")
 	helpFlag    = flag.Bool("h", false, "Shows this help message")
 	convertFlag = flag.Bool("c", false, "Create a new PNG from the given JPEG image")
@@ -41,8 +42,6 @@ func main() {
 	}
 	fmt.Printf("format: %s\n", format)
 
-	imageChan := make(chan types.ImageData)
-	defer close(imageChan)
 
 	var wg sync.WaitGroup
 
@@ -57,8 +56,12 @@ func main() {
 
 	imgCopy := image.NewRGBA64(image.Rect(0, 0, imgWidth, imgHeight))
 
-	partWidth := imgWidth / 10
-	partHeight := imgHeight / 10
+    maxProcs := runtime.GOMAXPROCS(0) * 2
+	partWidth := imgWidth / maxProcs
+	partHeight := imgHeight / maxProcs
+
+	imageChan := make(chan types.ImageData, 100)
+	defer close(imageChan)
 
 	for x := 0; x < imgWidth; x += partWidth {
 		for y := 0; y < imgHeight; y += partHeight {

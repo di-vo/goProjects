@@ -17,7 +17,7 @@ func pixelFilter(img image.Image, imgCopy *image.RGBA64, d types.ImagePartData, 
 		A: uint16(a),
 	}
 
-	if x > 0 && y > 0 && x%(radius*2+1) == 0 && y%(radius*2+1) == 0 {
+	if x >= radius && y >= radius && (x-radius)%(radius*2+1) == 0 && (y-radius)%(radius*2+1) == 0 {
 		size := img.Bounds().Size()
 
 		for i := x - radius; i < (x-radius)+(radius*2+1); i++ {
@@ -30,11 +30,6 @@ func pixelFilter(img image.Image, imgCopy *image.RGBA64, d types.ImagePartData, 
 				}
 			}
 		}
-	} else {
-		x = utils.MapToLocalCoords(x, d.Width, d.StartX)
-		y = utils.MapToLocalCoords(y, d.Height, d.StartY)
-
-		imgCopy.SetRGBA64(x, y, clr)
 	}
 
 }

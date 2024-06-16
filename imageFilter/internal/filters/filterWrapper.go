@@ -28,10 +28,10 @@ func ApplyFilter(filter string, img image.Image, d types.ImagePartData, imageCha
 			case "sort":
 				sortFilter(img, imgCopy, d, x, y)
 			case "pixel":
-				pixelFilter(img, imgCopy, d, x, y, 2)
-			case "basicKuwa":
-				basicKuwahara(img, imgCopy, d, x, y, 4)
-            case "generalKuwa":
+				pixelFilter(img, imgCopy, d, x, y, 1)
+			case "basicKuwahara":
+				basicKuwahara(img, imgCopy, d, x, y, 5)
+            case "generalKuwahara":
                 generalKuwahara(img, imgCopy, d, x, y, 4)
 			}
 		}
