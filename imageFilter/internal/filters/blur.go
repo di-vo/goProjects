@@ -71,6 +71,7 @@ func gaussianBlur(img image.Image, imgCopy *image.RGBA64, d types.ImagePartData,
 
                     r1, g1, b1, a1 := img.At(i, j).RGBA()
 
+                    // taking into account the distance to the current pixel
                     tclr := color.RGBA64{
                         R: uint16(float64(r1) / distance),
                         G: uint16(float64(g1) / distance),

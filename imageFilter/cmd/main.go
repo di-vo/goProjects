@@ -14,10 +14,11 @@ import (
 )
 
 var (
-    filterFlag  = flag.String("f", "", "Define a filter. Valid filters are:\n boxBlur\n gaussianBlur\n edge\n spot\n invert\n comic\n heat\n sort(VERY SLOW!)\n pixel(experimental)\n basicKuwahara\n generalKuwahara(experimental)")
+    filterFlag  = flag.String("f", "", "The filter to apply to the image. Valid filters are:\n boxBlur\n gaussianBlur\n edge\n spot\n invert\n comic\n heat\n sort (VERY SLOW!)\n pixel (experimental)\n basicKuwahara\n generalKuwahara (experimental)")
 	sourceFlag  = flag.String("s", "", "The name of the source image file")
 	helpFlag    = flag.Bool("h", false, "Shows this help message")
 	convertFlag = flag.Bool("c", false, "Create a new PNG from the given JPEG image")
+    threadsFlag = flag.Int("t", runtime.GOMAXPROCS(0), "Specify the number of threads used for the filter(0 < x <= image height)\nDefaults to the number of available threads")
 	outputName  string
 	filterName  string
 )
@@ -40,25 +41,19 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-	fmt.Printf("format: %s\n", format)
 
+	fmt.Printf("%s read in.\n", format)
 
 	var wg sync.WaitGroup
 
-	// 100 x 100
-
-	// 0, 0, 50, 50
-	// 50, 0, 50, 50
-	// 0, 50, 50, 50
-	// 50, 50, 50, 50
 	imgWidth := img.Bounds().Size().X
 	imgHeight := img.Bounds().Size().Y
 
 	imgCopy := image.NewRGBA64(image.Rect(0, 0, imgWidth, imgHeight))
 
-    maxProcs := runtime.GOMAXPROCS(0) * 2
-	partWidth := imgWidth / maxProcs
-	partHeight := imgHeight / maxProcs
+    //fmt.Printf("threads: %d\n", *threadsFlag)
+	partWidth := imgWidth
+	partHeight := imgHeight / *threadsFlag
 
 	imageChan := make(chan types.ImageData, 100)
 	defer close(imageChan)
@@ -90,8 +85,9 @@ func main() {
 	}()
 
 	wg.Wait()
+    fmt.Printf("Filter applied.\n")
 
 	utils.SaveNewImage(imgCopy, fmt.Sprintf("%s_%s.png", strings.Split(*sourceFlag, ".")[0], *filterFlag))
     end := time.Since(start)
-    fmt.Printf("Execution Time: %.4fs\n", end.Seconds())
+    fmt.Printf("Done!\nExecution Time: %.4fs\n", end.Seconds())
 }

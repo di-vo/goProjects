@@ -35,34 +35,61 @@ func SaveNewImage(img image.Image, outputName string) {
 
 // Helper function to generate a usable png image from a jpeg image
 func JpegToPngConv(fileName string) {
-    fi, err := os.Open(fileName)
-    if err != nil {
-        panic(err)
-    }
-    defer fi.Close()
+	fi, err := os.Open(fileName)
+	if err != nil {
+		panic(err)
+	}
+	defer fi.Close()
 
-    img, err := jpeg.Decode(fi)
-    if err != nil {
-        panic(err)
-    }
+	img, err := jpeg.Decode(fi)
+	if err != nil {
+		panic(err)
+	}
 
-    outFile, err := os.Create(strings.Split(fileName, ".")[0] + ".png")
-    if err != nil {
-        panic(err)
-    }
-    defer outFile.Close()
+	outFile, err := os.Create(strings.Split(fileName, ".")[0] + ".png")
+	if err != nil {
+		panic(err)
+	}
+	defer outFile.Close()
 
-    png.Encode(outFile, img)
+	png.Encode(outFile, img)
 }
 
 func GetIntensity(r, g, b uint32) float64 {
 	return (0.2126*float64(r) + 0.7152*float64(g) + 0.0722*float64(b))
 }
 
-func MapToLocalCoords(val int, length int, offset int) int{
-    if val >= length {
-        return val - offset
+func GetHue(r, g, b uint32) float64 {
+	clrMin := min(r, g, b)
+	clrMax := max(r, g, b)
+
+    if clrMin == clrMax {
+        return 0
     }
 
-    return val
+    var hue float64
+
+    if clrMax == r {
+        hue = float64((g - b) / (clrMax - clrMin))
+    } else if clrMax == g {
+        hue = float64(2 + (b - r) / (clrMax - clrMin))
+    } else {
+        hue = float64(4 + (r - g) / (clrMax - clrMin))
+    }
+
+    hue *= 60
+
+    if hue < 0 {
+        hue += 360
+    }
+
+    return hue
+}
+
+func MapToLocalCoords(val int, length int, offset int) int {
+	if val >= length {
+		return val - offset
+	}
+
+	return val
 }

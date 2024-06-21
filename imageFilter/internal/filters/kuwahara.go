@@ -79,6 +79,7 @@ func getGeneralizedColor(img image.Image, startX int, startY int, centerX int, c
 
 	var sectors [8]sector
 
+    // initialize sectors
 	for _, s := range sectors {
 		s.colors = append(s.colors, img.At(centerX, centerY))
 		s.contributionValue = 1.0
@@ -109,6 +110,7 @@ func getGeneralizedColor(img image.Image, startX int, startY int, centerX int, c
 		}
 	}
 
+    // calculate new color
 	sumWeights := 0.0
 	var sumR, sumG, sumB, sumA uint32
 
@@ -149,6 +151,12 @@ func getGeneralizedColor(img image.Image, startX int, startY int, centerX int, c
 }
 
 func basicKuwahara(img image.Image, imgCopy *image.RGBA64, d types.ImagePartData, x int, y int, kernel int) {
+    // NOTE: explanation:
+    // 1. define a sqare kernel around the pixel
+    // 2. split the kernel into four quadrants
+    // 3. calculate the average color and deviation for each quadrant
+    // 4. find the quadrant with the lowest deviation, and use its color for the pixel
+
 	quadrants := make(map[float64]color.RGBA64)
 
 	setQuadrantDataBox(img, x-kernel, y-kernel, x, y, kernel, quadrants)
@@ -178,6 +186,12 @@ func basicKuwahara(img image.Image, imgCopy *image.RGBA64, d types.ImagePartData
 }
 
 func generalKuwahara(img image.Image, imgCopy * image.RGBA64, d types.ImagePartData, x int, y int, kernel int) {
+    // NOTE: explanation:
+    // 1. define a circular kernel around the pixel
+    // 2. divide the kernel into eight sectors
+    // 3. calculate average color for each sector, taking into account the distance to the center pixel
+    // 4. use a specific formula to calculate the new color to apply to the pixel
+
 	clr := getGeneralizedColor(img, x-kernel, y-kernel, x, y, kernel)
 
 	x = utils.MapToLocalCoords(x, d.Width, d.StartX)

@@ -9,14 +9,14 @@ import (
 )
 
 func sortFilter(img image.Image, imgCopy *image.RGBA64, d types.ImagePartData, x int, y int) {
-	// NOTE: New Idea:
+	// NOTE: New Idea (I know this is very slow but I can't think of a smarter solution rn):
 	// 1. Make array containing colors of the row
 	// 2. Sort array based on intensity
 	// 3. Use x to get correct color
 
 	rowColors := make([]color.RGBA64, img.Bounds().Size().X)
 
-	for i := img.Bounds().Min.X; i < img.Bounds().Max.X; i++ {
+	for i := range img.Bounds().Size().X {
 		r, g, b, a := img.At(i, y).RGBA()
 
 		clr := color.RGBA64{
@@ -33,8 +33,11 @@ func sortFilter(img image.Image, imgCopy *image.RGBA64, d types.ImagePartData, x
 		r1, g1, b1, _ := rowColors[i].RGBA()
 		r2, g2, b2, _ := rowColors[j].RGBA()
 
-		intens1 := utils.GetIntensity(r1, b1, g1)
-		intens2 := utils.GetIntensity(r2, b2, g2)
+        intens1 := utils.GetIntensity(r1, b1, g1)
+        intens2 := utils.GetIntensity(r2, b2, g2)
+
+        // hue1 := utils.GetHue(r1, g1, b1)
+        // hue2 := utils.GetHue(r2, g2, b2)
 
 		return intens1 < intens2
 	})
