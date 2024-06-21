@@ -45,7 +45,7 @@ func main() {
 		panic(err)
 	}
 
-	fmt.Printf("%s read in.\n", format)
+	fmt.Printf("%s read in\n", format)
 
 	var wg sync.WaitGroup
 
@@ -54,12 +54,13 @@ func main() {
 
 	imgCopy := image.NewRGBA64(image.Rect(0, 0, imgWidth, imgHeight))
 
-	//fmt.Printf("threads: %d\n", *threadsFlag)
 	partWidth := imgWidth
 	partHeight := imgHeight / *threadsFlag
 
 	imageChan := make(chan types.ImageData, 100)
 	defer close(imageChan)
+
+    filterStart := time.Now()
 
 	for x := 0; x < imgWidth; x += partWidth {
 		for y := 0; y < imgHeight; y += partHeight {
@@ -88,25 +89,23 @@ func main() {
 			BarStart:      "[",
 			BarEnd:        "]",
 		}),
-		progressbar.OptionOnCompletion(func() { fmt.Println() }))
+        progressbar.OptionOnCompletion(func() { fmt.Printf("\nTime to apply the filter: %.4fs\n", time.Since(filterStart).Seconds()) }))
 
 	go func() {
 		for m := range imageChan {
 			// fmt.Printf("image received: %d, %d\n", m.StartX, m.StartY)
+			bar.Add(1)
 			for x := range m.Img.Bounds().Size().X {
 				for y := range m.Img.Bounds().Size().Y {
 					imgCopy.Set(m.StartX+x, m.StartY+y, m.Img.At(x, y))
 				}
 			}
 			wg.Done()
-			bar.Add(1)
 		}
 	}()
 
 	wg.Wait()
-	// fmt.Printf("Filter applied.\n")
 
 	utils.SaveNewImage(imgCopy, fmt.Sprintf("%s_%s.png", strings.Split(*sourceFlag, ".")[0], *filterFlag))
-	end := time.Since(start)
-	fmt.Printf("Done!\nExecution Time: %.4fs\n", end.Seconds())
+	fmt.Printf("Done!\nTotal execution time: %.4fs\n", time.Since(start).Seconds())
 }
