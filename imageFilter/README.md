@@ -3,6 +3,10 @@
 A CLI tool for applying various filters to images.
 Works for both png and jpeg, but always produces a png for the filtered image.
 
+## Installation
+
+After downloading the source code, use make build to create a build version.
+
 ## Usage
 
 You can use the following flags to use the program:
