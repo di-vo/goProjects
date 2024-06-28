@@ -1,7 +1,7 @@
 package internal
 
 import (
-	types "assignments/imageFilter/internal/types"
+	types "github.com/di-vo/goProjects/imageFilter/internal/types"
 	"image"
 )
 
@@ -22,7 +22,7 @@ func ApplyFilter(filter string, img image.Image, d types.ImagePartData, imageCha
 			case "boxBlur":
 				boxBlurFilter(img, imgCopy, d, x, y, 4)
 			case "gaussianBlur":
-				gaussianBlur(img, imgCopy, d, x, y, 4)
+				gaussianBlurFilter(img, imgCopy, d, x, y, 4)
 			case "heat":
 				heatFilter(img, imgCopy, d, x, y)
 			case "sort":
@@ -30,9 +30,9 @@ func ApplyFilter(filter string, img image.Image, d types.ImagePartData, imageCha
 			case "pixel":
 				pixelFilter(img, imgCopy, d, x, y, 2)
 			case "basicKuwahara":
-				basicKuwahara(img, imgCopy, d, x, y, 4)
+				basicKuwaharaFilter(img, imgCopy, d, x, y, 4)
             case "generalKuwahara":
-                generalKuwahara(img, imgCopy, d, x, y, 4)
+                generalKuwaharaFilter(img, imgCopy, d, x, y, 4)
 			}
 		}
 	}

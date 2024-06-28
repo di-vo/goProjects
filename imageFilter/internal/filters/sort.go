@@ -1,8 +1,8 @@
 package internal
 
 import (
-	"assignments/imageFilter/internal/types"
-	utils "assignments/imageFilter/internal/utils"
+	"github.com/di-vo/goProjects/imageFilter/internal/types"
+	utils "github.com/di-vo/goProjects/imageFilter/internal/utils"
 	"image"
 	"image/color"
 	"sort"

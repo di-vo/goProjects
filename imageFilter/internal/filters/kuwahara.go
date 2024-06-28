@@ -1,8 +1,8 @@
 package internal
 
 import (
-	"assignments/imageFilter/internal/types"
-	utils "assignments/imageFilter/internal/utils"
+	"github.com/di-vo/goProjects/imageFilter/internal/types"
+	utils "github.com/di-vo/goProjects/imageFilter/internal/utils"
 	"image"
 	"image/color"
 	"math"
@@ -150,7 +150,7 @@ func getGeneralizedColor(img image.Image, startX int, startY int, centerX int, c
 	}
 }
 
-func basicKuwahara(img image.Image, imgCopy *image.RGBA64, d types.ImagePartData, x int, y int, kernel int) {
+func basicKuwaharaFilter(img image.Image, imgCopy *image.RGBA64, d types.ImagePartData, x int, y int, kernel int) {
     // NOTE: explanation:
     // 1. define a sqare kernel around the pixel
     // 2. split the kernel into four quadrants
@@ -185,7 +185,7 @@ func basicKuwahara(img image.Image, imgCopy *image.RGBA64, d types.ImagePartData
 
 }
 
-func generalKuwahara(img image.Image, imgCopy * image.RGBA64, d types.ImagePartData, x int, y int, kernel int) {
+func generalKuwaharaFilter(img image.Image, imgCopy * image.RGBA64, d types.ImagePartData, x int, y int, kernel int) {
     // NOTE: explanation:
     // 1. define a circular kernel around the pixel
     // 2. divide the kernel into eight sectors

@@ -1,4 +1,4 @@
-module assignments/imageFilter
+module github.com/di-vo/goProjects/imageFilter
 
 go 1.22.2
 

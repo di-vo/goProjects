@@ -1,9 +1,9 @@
 package main
 
 import (
-	filters "assignments/imageFilter/internal/filters"
-	types "assignments/imageFilter/internal/types"
-	utils "assignments/imageFilter/internal/utils"
+	filters "github.com/di-vo/goProjects/imageFilter/internal/filters"
+	types "github.com/di-vo/goProjects/imageFilter/internal/types"
+	utils "github.com/di-vo/goProjects/imageFilter/internal/utils"
 	"flag"
 	"fmt"
 	"image"

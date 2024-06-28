@@ -1,8 +1,8 @@
 package internal
 
 import (
-	"assignments/imageFilter/internal/types"
-	utils "assignments/imageFilter/internal/utils"
+	"github.com/di-vo/goProjects/imageFilter/internal/types"
+	utils "github.com/di-vo/goProjects/imageFilter/internal/utils"
 	"image"
 	"image/color"
 	"math"
@@ -48,7 +48,7 @@ func boxBlurFilter(img image.Image, imgCopy *image.RGBA64, d types.ImagePartData
 	imgCopy.SetRGBA64(x, y, clr)
 }
 
-func gaussianBlur(img image.Image, imgCopy *image.RGBA64, d types.ImagePartData, x int, y int, kernel int) {
+func gaussianBlurFilter(img image.Image, imgCopy *image.RGBA64, d types.ImagePartData, x int, y int, kernel int) {
 	size := img.Bounds().Size()
 
 	r, g, b, a := img.At(x, y).RGBA()

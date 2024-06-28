@@ -17,7 +17,7 @@ You can use the following flags to use the program:
   - comic
   - heat
   - sort (VERY SLOW!)
-  - pixel
+  - pixel (Experimental)
   - basicKuwahara
   - generalKuwahara (Experimental)
 - -t (threads): specify the number of threads that should be used when applying the filter. Omit to use maximum available threads.
@@ -35,7 +35,7 @@ You can use the following flags to use the program:
 - comic: clamps intensities to a predefined palette of three colors
 - heat: replicates a heat camera image effect
 - sort: sorts pixels in each row, based on their intesity. Currently very slow, did not implement this in a smart way
-- pixel: simple pixelation filter
+- pixel: simple pixelation filter, which unfortunatly still produces black lines when running the filter concurrent
 - basicKuwahara: the kuwahara filter gives an image an artsy look. Works best on realistic images
 - generalKuwahara: a more sophisticated version, which I didn't manage to properly implemented yet
 
