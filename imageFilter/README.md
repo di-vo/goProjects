@@ -5,7 +5,7 @@ Works for both png and jpeg, but always produces a png for the filtered image.
 
 ## Installation
 
-After downloading the source code, use make build to create a build version.
+After downloading the source code, create a builds directory and then use make build to create a build version.
 
 ## Usage
 
