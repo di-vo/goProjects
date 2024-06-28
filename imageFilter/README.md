@@ -1,6 +1,7 @@
 # Image Filter tool
 
 A CLI tool for applying various filters to images.
+Works for both png and jpeg, but always produces a png for the filtered image.
 
 ## Usage
 
@@ -37,3 +38,9 @@ You can use the following flags to use the program:
 - pixel: simple pixelation filter
 - basicKuwahara: the kuwahara filter gives an image an artsy look. Works best on realistic images
 - generalKuwahara: a more sophisticated version, which I didn't manage to properly implemented yet
+
+## Example
+
+```bash
+builds/imageFilter -s testImage.png -f gaussianBlur -t 12
+```
