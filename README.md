@@ -11,4 +11,4 @@ This is a collection of personal projects and assignments in go.
 - [linkedList](./linkedList)
   - My own implementation of a linked list data structure.
 - [snake](./snake)
-  - An (unfinished) snake game using the [bubbletea](github.com/charmbracelet/bubbletea) framework.
+  - An (unfinished) snake game using the [bubbletea](https://github.com/charmbracelet/bubbletea) framework.
