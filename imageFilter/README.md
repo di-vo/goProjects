@@ -12,7 +12,7 @@ After downloading the source code, create a builds directory and then use make b
 You can use the following flags to use the program:
 
 - -s (source): specify the path to the image you want to apply a filter to
-- -f (filter): speficy which filter you want to use. Following options are available:
+- -f (filter): specify which filter you want to use. Following options are available:
   - boxBlur
   - gaussianBlur
   - edge
